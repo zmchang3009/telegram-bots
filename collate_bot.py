@@ -24,12 +24,12 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     list_topic = ''
     user: str = update.message.from_user.username
     list_owner = user
-    await update.message.reply_text(f"{user} has started a new list. Please suggest a topic or title.")
+    await update.message.reply_text(f'{user} has started a new list. Please suggest a topic or title.')
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
-    await update.message.reply_text("I help collate responses from users.")
+    await update.message.reply_text('I help collate responses from users.\nSimply start a list, then @mention me to add your response to the list.')
 
 
 async def collate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -68,7 +68,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     print(f'User {user} in {message_type}: "{text}"')
 
     ## Handle setting list topic
-    if list_topic == '' and list_owner == user:
+    if list_topic == '' and list_owner == user and BOT_USERNAME in text:
         list_topic = text
         await update.message.reply_text(f'Please start suggesting items for list {list_topic}.')
         return
