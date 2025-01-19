@@ -154,9 +154,18 @@ def main() -> None:
     ## Errors
     application.add_error_handler(error_handler)
 
-    ## Run the bot until the user presses Ctrl-C
-    print('Polling...')
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # ## Run the bot until the user presses Ctrl-C
+    # print('Polling...')
+    # application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+    ## Run webhook
+    PORT = int(os.environ.get('PORT', '8443'))
+    application.run_webhook(
+        listen='0.0.0.0',
+        port=PORT,
+        # secret_token='ASecretTokenIHaveChangedByNow',
+        webhook_url='https://zhemsbot-71ff43521989.herokuapp.com/'
+    )
 
 
 
