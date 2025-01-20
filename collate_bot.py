@@ -94,8 +94,6 @@ async def items_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             new_text: str = text.replace(BOT_USERNAME, '').strip()
             collated_responses[user] = new_text
             print(f'User {user} response recorded')
-        else:
-            return
     else:
         collated_responses[user] = text
         print(f'User {user} response recorded')
@@ -152,7 +150,7 @@ def main() -> None:
         entry_points=[CommandHandler('start', start_command)],
         states={
             TOPIC: [MessageHandler(filters.REPLY, topic_handler)],
-            ITEMS: [MessageHandler(filters.TEXT & ~filters.COMMAND, items_handler)]
+            ITEMS: [MessageHandler(filters.Mention(f'@{BOT_USERNAME}') & ~filters.COMMAND, items_handler)]
         },
         fallbacks=[CommandHandler('stop', stop_handler)]
     )
