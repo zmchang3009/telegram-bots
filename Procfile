@@ -1,1 +1,1 @@
-web: python main.py
+web: python collate_bot.py
