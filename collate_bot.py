@@ -53,6 +53,13 @@ async def collate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 ## Message handlers
+
+## Message handler for 'supper'
+async def supper_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Reply to messages containing the word 'supper'."""
+    if 'supper' in update.message.text.lower():
+        await update.message.reply_text('Well well well')
+
 ## Handle setting list topic (Only listens to replies)
 async def topic_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle setting the list topic."""
@@ -150,6 +157,9 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("collate", collate_command))
+    
+    ## JC's supper handler
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, supper_handler))
     
     ## Errors
     application.add_error_handler(error_handler)
