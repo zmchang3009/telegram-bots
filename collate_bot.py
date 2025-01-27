@@ -11,6 +11,18 @@ TOKEN: Final = os.environ.get('ZHEMS_BOT_API')
 BOT_USERNAME: Final = '@zhemsbot'
 
 
+# import logging
+
+# # Enable logging
+# logging.basicConfig(
+#     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+# )
+# # set higher logging level for httpx to avoid all GET and POST requests being logged
+# logging.getLogger("httpx").setLevel(logging.WARNING)
+
+# logger = logging.getLogger(__name__)
+
+
 ## States
 TOPIC, ITEMS = range(2)
 
@@ -82,8 +94,6 @@ async def items_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             new_text: str = text.replace(BOT_USERNAME, '').strip()
             collated_responses[user] = new_text
             print(f'User {user} response recorded')
-        else:
-            return
     else:
         collated_responses[user] = text
         print(f'User {user} response recorded')
@@ -140,7 +150,7 @@ def main() -> None:
         entry_points=[CommandHandler('start', start_command)],
         states={
             TOPIC: [MessageHandler(filters.REPLY, topic_handler)],
-            ITEMS: [MessageHandler(filters.TEXT & ~filters.COMMAND, items_handler)]
+            ITEMS: [MessageHandler(filters.Mention(f'@{BOT_USERNAME}') & ~filters.COMMAND, items_handler)]
         },
         fallbacks=[CommandHandler('stop', stop_handler)]
     )
@@ -154,9 +164,18 @@ def main() -> None:
     ## Errors
     application.add_error_handler(error_handler)
 
-    ## Run the bot until the user presses Ctrl-C
-    print('Polling...')
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # ## Run the bot until the user presses Ctrl-C
+    # print('Polling...')
+    # application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+    ## Run webhook
+    PORT = int(os.environ.get('PORT', '8443'))
+    application.run_webhook(
+        listen='0.0.0.0',
+        port=PORT,
+        # secret_token='ASecretTokenIHaveChangedByNow',
+        webhook_url='https://zhemsbot-71ff43521989.herokuapp.com/'
+    )
 
 
 
