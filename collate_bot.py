@@ -42,6 +42,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     list_topic = ''
     user: str = update.message.from_user.username
     list_owner = user
+
+    # print(f'New list started in chat {update.message.chat_id} by {user}')
     
     sent_message = await update.message.reply_text(
         f'{user} has started a new list. Please suggest a topic or title.',
@@ -88,6 +90,7 @@ async def topic_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 
 ## Handle incoming list items
+##TODO: Handle edited messages
 async def items_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle incoming list items."""
     global collated_responses, list_topic, list_owner
@@ -101,9 +104,11 @@ async def items_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             new_text: str = text.replace(BOT_USERNAME, '').strip()
             collated_responses[user] = new_text
             print(f'User {user} response recorded')
+            # print(f'Collated responses: {collated_responses}')
     else:
         collated_responses[user] = text
         print(f'User {user} response recorded')
+        # print(f'Collated responses: {collated_responses}')
 
 
 ## Fallback handler
@@ -150,7 +155,10 @@ def main() -> None:
     """Start the bot."""
     ## Create the Application with token.
     print('Starting bot...')
-    application = Application.builder().token(TOKEN).build()
+    application_builder = Application.builder() \
+        .token(TOKEN) \
+        .concurrent_updates(concurrent_updates=False) ## ConversationHandler does not support concurrent updates 
+    application = application_builder.build()
 
     ## Conversation handler
     conv_handler = ConversationHandler(
@@ -159,7 +167,8 @@ def main() -> None:
             TOPIC: [MessageHandler(filters.REPLY, topic_handler)],
             ITEMS: [MessageHandler(filters.Mention(f'@{BOT_USERNAME}') & ~filters.COMMAND, items_handler)]
         },
-        fallbacks=[CommandHandler('stop', stop_handler)]
+        fallbacks=[CommandHandler('stop', stop_handler)],
+        per_user=False ## Allow all users to contribute to the same list
     )
     application.add_handler(conv_handler)
 

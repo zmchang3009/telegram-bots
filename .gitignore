@@ -1,1 +1,6 @@
+## Environment files
 .env
+
+## Cache
+__pycache__
+.vscode
